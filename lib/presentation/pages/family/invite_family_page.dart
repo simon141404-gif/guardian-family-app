@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class InviteFamilyPage extends StatelessWidget{const InviteFamilyPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Invite Family")),body:const Center(child:Text("Invite Family Page")));}

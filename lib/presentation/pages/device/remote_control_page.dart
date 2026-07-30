@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class RemoteControlPage extends StatelessWidget{final String childId;const RemoteControlPage({super.key,required this.childId});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Remote Control")),body:Center(child:Text("Remote: \$childId")));}

@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class ScreenTimePage extends StatelessWidget{const ScreenTimePage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Screen Time")),body:const Center(child:Text("Screen Time Page")));}

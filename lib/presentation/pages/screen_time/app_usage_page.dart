@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class AppUsagePage extends StatelessWidget{final String childId;const AppUsagePage({super.key,required this.childId});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("App Usage")),body:Center(child:Text("Usage: \$childId")));}

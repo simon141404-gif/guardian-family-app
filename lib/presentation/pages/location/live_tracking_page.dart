@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class LiveTrackingPage extends StatelessWidget{final String childId;const LiveTrackingPage({super.key,required this.childId});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Live Tracking")),body:Center(child:Text("Tracking: \$childId")));}

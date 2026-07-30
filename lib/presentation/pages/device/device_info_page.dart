@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class DeviceInfoPage extends StatelessWidget{final String childId;const DeviceInfoPage({super.key,required this.childId});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Device Info")),body:Center(child:Text("Device: \$childId")));}

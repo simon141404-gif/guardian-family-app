@@ -1,0 +1,1 @@
+import "package:flutter/material.dart";class VideoCallPage extends StatelessWidget{final String callId;const VideoCallPage({super.key,required this.callId});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Video Call")),body:Center(child:Text("Call: \$callId")));}
