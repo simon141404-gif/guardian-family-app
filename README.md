@@ -4,15 +4,23 @@
 
 A comprehensive family management Android application for parental control, child monitoring, and family safety.
 
-## ⚠️ IMPORTANT SETUP REQUIRED
+## ✅ DEMO MODE AVAILABLE!
 
-This app **REQUIRES Firebase configuration** to function. Without proper setup, the app will crash on launch.
+The app now includes **Demo Mode** - it will run without Firebase configuration!
+
+- 📱 **Download the APK below** and install directly
+- 🎯 **Demo Mode button** appears on the login screen
+- 🔓 **No Firebase setup required** to try the app
+
+## 📥 Download APK
+
+**[Download Guardian Family v1.0.0](https://github.com/simon141404-gif/guardian-family-app/releases/download/v1.0.0/guardian_family-v1.0.0-debug.apk)**
 
 ### Prerequisites
 
 1. **Flutter SDK 3.x** or higher
 2. **Android SDK** (API 26+)
-3. **Firebase Project** with the following services enabled:
+3. **Firebase Project** (optional - for full features):
    - Authentication
    - Cloud Firestore
    - Realtime Database
@@ -21,7 +29,7 @@ This app **REQUIRES Firebase configuration** to function. Without proper setup, 
    - Analytics
    - Crashlytics
 
-### Firebase Setup Steps
+### Firebase Setup Steps (Optional - for full functionality)
 
 1. **Create Firebase Project**
    - Go to [Firebase Console](https://console.firebase.google.com/)
