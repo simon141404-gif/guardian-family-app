@@ -1,8 +1,1 @@
-import 'package:flutter/material.dart';
-class FamilyPage extends StatelessWidget {
-  const FamilyPage({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text('Family')), body: const Center(child: Text('Family Page')));
-  }
-}
+import "package:flutter/material.dart";class FamilyPage extends StatelessWidget{const FamilyPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Family")),body:Center(child:Text("Family Page")));}

@@ -1,1 +1,1 @@
-import "package:flutter/material.dart";class SosPage extends StatelessWidget{const SosPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("SOS")),body:const Center(child:Text("SOS Page")));}
+import "package:flutter/material.dart";class SosPage extends StatelessWidget{const SosPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("SOS")),body:Center(child:Text("SOS Page")));}

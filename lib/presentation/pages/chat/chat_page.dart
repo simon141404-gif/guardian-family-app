@@ -1,1 +1,1 @@
-import "package:flutter/material.dart";class ChatPage extends StatelessWidget{const ChatPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Chat")),body:const Center(child:Text("Chat Page")));}
+import "package:flutter/material.dart";class ChatPage extends StatelessWidget{const ChatPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("Chat")),body:Center(child:Text("Chat Page")));}

@@ -1,1 +1,1 @@
-import "package:flutter/material.dart";class AppManagementPage extends StatelessWidget{const AppManagementPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("App Management")),body:const Center(child:Text("App Management Page")));}
+import "package:flutter/material.dart";class AppManagementPage extends StatelessWidget{const AppManagementPage({super.key});@override Widget build(BuildContext context)=>Scaffold(appBar:AppBar(title:const Text("App Management")),body:Center(child:Text("App Management Page")));}
