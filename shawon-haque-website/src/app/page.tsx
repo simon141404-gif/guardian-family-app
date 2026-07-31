@@ -517,6 +517,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Personal Dashboard Section */}
+      <section id="dashboard" className="py-32 px-4 relative bg-gradient-to-b from-transparent via-indigo-950/20 to-transparent">
+        <div className="max-w-6xl mx-auto">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">🎯 Personal Dashboard</motion.h2>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-center text-gray-400 mb-16 max-w-2xl mx-auto">Access all your tools in one place - Documents, Calendar, Projects, Passwords, and more!</motion.p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+            {[
+              { icon: FileText, title: 'Documents', desc: 'Create & manage docs', color: 'from-blue-500 to-cyan-500', href: '/dashboard' },
+              { icon: Calendar, title: 'Calendar', desc: 'Schedule events', color: 'from-purple-500 to-pink-500', href: '/dashboard' },
+              { icon: FolderKanban, title: 'Projects', desc: 'Track progress', color: 'from-emerald-500 to-teal-500', href: '/dashboard' },
+              { icon: Image, title: 'Gallery', desc: 'Photo management', color: 'from-pink-500 to-rose-500', href: '/dashboard' },
+              { icon: MessageSquare, title: 'AI Chat', desc: 'Chat with AI', color: 'from-indigo-500 to-purple-500', href: '/dashboard' },
+              { icon: Bell, title: 'Notifications', desc: 'Stay updated', color: 'from-amber-500 to-orange-500', href: '/dashboard' },
+              { icon: Bookmark, title: 'Bookmarks', desc: 'Save links', color: 'from-cyan-500 to-blue-500', href: '/dashboard' },
+              { icon: Lock, title: 'Password Vault', desc: 'Secure passwords', color: 'from-red-500 to-pink-500', href: '/dashboard' },
+              { icon: Music, title: 'Music', desc: 'Listen & relax', color: 'from-violet-500 to-purple-500', href: '/dashboard' },
+              { icon: QrCode, title: 'QR Code', desc: 'Generate codes', color: 'from-teal-500 to-emerald-500', href: '/dashboard' },
+            ].map((item, i) => (
+              <motion.a
+                key={item.title}
+                href={item.href}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.05 }}
+                className="glass rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group text-center"
+              >
+                <div className={`w-14 h-14 mx-auto rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <item.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="font-bold text-sm mb-1">{item.title}</h3>
+                <p className="text-xs text-gray-400">{item.desc}</p>
+              </motion.a>
+            ))}
+          </div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center">
+            <a href="/dashboard" className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
+              <LayoutDashboard size={20} /> Open Full Dashboard
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Blog Section */}
       <section id="blog" className="py-32 px-4 relative">
         <div className="max-w-6xl mx-auto">
