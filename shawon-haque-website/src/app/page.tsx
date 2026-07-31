@@ -500,15 +500,37 @@ export default function Home() {
       {/* Dashboard Section */}
       <section id="dashboard" className="py-32 px-4" style={{background: 'rgba(0, 0, 0, 0.3)'}}>
         <div className="max-w-6xl mx-auto">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-16" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>🎯 Personal Dashboard</motion.h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
-            {[{ icon: Target, title: 'Tasks', id: 'tasks' }, { icon: Folder, title: 'Projects', id: 'projects' }, { icon: CalendarDays, title: 'Calendar', id: 'calendar' }, { icon: Image, title: 'Gallery' }, { icon: Bookmark, title: 'Bookmarks' }, { icon: Lock, title: 'Passwords' }].map((item, i) => (
-              <motion.button key={item.title} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} whileHover={{ scale: 1.05 }} onClick={() => item.id && setActiveModal(item.id)} className="rounded-2xl p-6 text-center backdrop-blur-xl transition-all" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
-                <div className="w-14 h-14 mx-auto rounded-xl flex items-center justify-center mb-4" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><item.icon className="w-7 h-7 text-white" /></div>
-                <h3 className="font-bold text-sm">{item.title}</h3>
-              </motion.button>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-4" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>🎯 Personal Dashboard</motion.h2>
+          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-center text-gray-400 mb-16">All your tools in one place</motion.p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            {[
+              { icon: FileText, title: 'Documents', desc: 'Manage docs', color: 'from-blue-500 to-cyan-500' },
+              { icon: Calendar, title: 'Calendar', desc: 'Schedule', color: 'from-purple-500 to-pink-500' },
+              { icon: FolderKanban, title: 'Projects', desc: 'Track progress', color: 'from-emerald-500 to-teal-500' },
+              { icon: Image, title: 'Gallery', desc: 'Photos', color: 'from-pink-500 to-rose-500' },
+              { icon: Bot, title: 'AI Chat', desc: 'Smart assistant', color: 'from-indigo-500 to-purple-500' },
+              { icon: Bell, title: 'Notifications', desc: 'Stay updated', color: 'from-amber-500 to-orange-500' },
+              { icon: Bookmark, title: 'Bookmarks', desc: 'Save links', color: 'from-cyan-500 to-blue-500' },
+              { icon: Lock, title: 'Password Vault', desc: 'Secure', color: 'from-red-500 to-pink-500' },
+              { icon: Music, title: 'Music', desc: 'Listen', color: 'from-violet-500 to-purple-500' },
+              { icon: QrCode, title: 'QR Code', desc: 'Generate', color: 'from-teal-500 to-emerald-500' },
+            ].map((item, i) => (
+              <motion.a key={item.title} href="/dashboard" initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} whileHover={{ scale: 1.05 }} className="rounded-2xl p-5 text-center backdrop-blur-xl transition-all" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+                <div className="w-12 h-12 mx-auto rounded-xl flex items-center justify-center mb-3" style={{background: `linear-gradient(135deg, ${item.color.split(' ')[1] === 'to-cyan-500' ? 'rgba(59, 130, 246' : item.color.includes('purple') ? 'rgba(168, 85, 247' : item.color.includes('pink') ? 'rgba(236, 72, 153' : item.color.includes('emerald') ? 'rgba(16, 185, 129' : item.color.includes('amber') ? 'rgba(245, 158, 11' : item.color.includes('red') ? 'rgba(239, 68, 68' : item.color.includes('violet') ? 'rgba(139, 92, 246' : 'rgba(99, 102, 241'}, 0.8), ${item.color.includes('cyan') ? 'rgba(34, 211, 238, 0.8)' : item.color.includes('pink') ? 'rgba(244, 63, 94, 0.8)' : item.color.includes('teal') ? 'rgba(20, 184, 166, 0.8)' : item.color.includes('orange') ? 'rgba(249, 115, 22, 0.8)' : item.color.includes('rose') ? 'rgba(244, 63, 94, 0.8)' : item.color.includes('blue') ? 'rgba(59, 130, 246, 0.8)' : 'rgba(168, 85, 247, 0.8)'})`}}>
+                  <item.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-sm mb-1">{item.title}</h3>
+                <p className="text-xs text-gray-500">{item.desc}</p>
+              </motion.a>
             ))}
           </div>
+          
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center">
+            <a href="/dashboard" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white shadow-lg backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', boxShadow: '0 10px 40px rgba(99, 102, 241, 0.4)'}}>
+              <LayoutDashboard size={20} /> Open Dashboard
+            </a>
+          </motion.div>
         </div>
       </section>
 
