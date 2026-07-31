@@ -252,7 +252,7 @@ function AISummarize() {
 }
 
 // AI TRANSLATOR - Working
-functionAITranslator() {
+function AITranslator() {
   const [inputText, setInputText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [sourceLang, setSourceLang] = useState('en');
