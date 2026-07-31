@@ -3,30 +3,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Github, Linkedin, Twitter, Mail, ExternalLink,
-  Code2, Sparkles, Zap, Globe, Bot,
-  ChevronDown, Menu as MenuIcon, X, Sun, Moon,
-  FileText, Calendar, FolderKanban, Image,
-  MessageSquare, Bell, Bookmark, Lock, Settings,
-  LayoutDashboard, Music, QrCode, Eye, EyeOff,
-  Search, Wand2, Languages, Mic, Scan,
-  Send, TrendingUp, User, File,
-  Shield, Rocket, Target, Award, Users, Heart,
-  Play, Pause, SkipForward, Volume2,
-  Camera, Video, Phone, Paperclip, Smile,
-  LogIn, LogOut, UserPlus, Key, Fingerprint,
-  Check, AlertCircle, Loader2, Copy, Trash2, Download,
-  Clock, Globe2, Sparkle, Loader, Sun as SunIcon, Sunset
+  Github, Linkedin, Twitter, Mail, ExternalLink, Bot, ChevronDown, Menu as MenuIcon, X,
+  FileText, Calendar, FolderKanban, Image, MessageSquare, Bell, Bookmark, Lock,
+  LayoutDashboard, Music, QrCode, Search, Send, TrendingUp, User, Rocket, Sparkle,
+  LogIn, LogOut, UserPlus, Eye, EyeOff, Check, AlertCircle, Loader2, Copy, Clock, Plus, Trash2, Download, CalendarDays, Target, Zap, Folder
 } from 'lucide-react';
 
 // Types
 interface ChatMessage { id: string; role: 'user' | 'assistant'; content: string; timestamp: Date; }
-interface AuthUser { name: string; email: string; avatar: string; loginTime: Date; }
-interface Project { id: number; title: string; description: string; tech: string[]; icon: any; gradient: string; demo: string; }
-interface Skill { name: string; level: number; color: string; }
-interface Feature { icon: any; title: string; description: string; color: string; modal: string; }
-interface BlogPost { id: number; title: string; date: string; readTime: string; category: string; image: string; }
-interface SearchResult { id: number; title: string; desc: string; category: string; url: string; }
+interface Task { id: number; title: string; priority: 'high' | 'medium' | 'low'; completed: boolean; }
+interface Project { id: number; title: string; progress: number; status: string; }
+interface Event { id: number; title: string; date: string; time: string; type: string; }
+interface Document { id: number; title: string; type: string; size: string; }
+interface Bookmark { id: number; title: string; url: string; category: string; }
+interface Password { id: number; site: string; username: string; password: string; }
+interface Notification { id: number; title: string; message: string; time: string; read: boolean; }
 
 // Modal Component
 function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
@@ -34,8 +25,8 @@ function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
     <AnimatePresence>
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={onClose}>
-          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl" style={{background: 'rgba(15, 15, 25, 0.95)', backdropFilter: 'blur(20px)', border: '1px solid rgba(102, 126, 234, 0.3)'}} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl backdrop-blur-xl" style={{background: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(148, 163, 184, 0.2)'}} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(168, 85, 247, 0.8))'}}>
               <h2 className="text-xl font-bold text-white">{title}</h2>
               <button onClick={onClose} className="p-2 rounded-lg" style={{background: 'rgba(255,255,255,0.2)'}}><X size={20} className="text-white" /></button>
             </div>
@@ -47,22 +38,88 @@ function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
   );
 }
 
-// AI ASSISTANT
-function AIAssistant() {
-  const [messages, setMessages] = useState<ChatMessage[]>([{ id: '1', role: 'assistant', content: "👋 Hello! I'm Shawon AI - your personal assistant. Ask me anything!", timestamp: new Date() }]);
+// SMART AI CHATBOT - Contextual Responses
+function SmartChatbot() {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { id: '1', role: 'assistant', content: "👋 Hi! I'm your AI assistant. I can help you with coding, design, web development, AI, and much more! Ask me anything!", timestamp: new Date() }
+  ]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
-  const generateResponse = (userInput: string): string => {
+  const generateSmartResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
-    if (input.includes('code') || input.includes('programming') || input.includes('python')) return "I can help with coding! 🔹 Use clean, readable code\n🔹 Add comments for complex logic\n🔹 Follow DRY principle\n🔹 Write tests before deploying\n🔹 Use version control (Git)\n\nWould you like specific code help?";
-    if (input.includes('ai') || input.includes('chatgpt')) return "AI is amazing! 🤖\n\n• Code generation & review\n• Data analysis\n• Customer service\n• Content creation\n• Problem solving\n\nPopular AI: ChatGPT, Claude, Midjourney, DALL-E\n\nWant to learn more?";
-    if (input.includes('career') || input.includes('job')) return "Career advice: 📌\n\n• Build a strong portfolio\n• Contribute to open source\n• Network on LinkedIn\n• Practice coding problems\n• Learn system design\n• Prepare for interviews\n\nSoft skills matter as much as technical!";
-    if (input.includes('help')) return "I can help you with: 💻\n\n• Coding & Programming\n• AI & Machine Learning\n• Data Science\n• Design & UI/UX\n• Career Advice\n• App Development\n• Web Development\n\nJust ask me anything!";
-    return `Great question about "${userInput}"! 🤔\n\nI suggest:\n• Search online resources\n• Check documentation\n• Ask experts\n• Try different approaches\n\nIs there something specific about tech I can help with?`;
+    
+    // React related
+    if (input.includes('react') && (input.includes('hook') || input.includes('state'))) {
+      return "🔹 React Hooks Tips:\n\n• useState - For local state\n• useEffect - For side effects\n• useCallback - Memoize functions\n• useMemo - Memoize values\n• useRef - Access DOM or persist values\n\nExample:\n```jsx\nconst [count, setCount] = useState(0);\n```\n\nNeed more details?";
+    }
+    
+    if (input.includes('react') || input.includes('nextjs') || input.includes('next.js')) {
+      return "⚛️ React/Next.js Development:\n\n📌 Key Points:\n• React uses components & props\n• Next.js provides SSR & routing\n• App Router is the new standard\n• Server Components reduce bundle size\n• Use 'use client' for interactivity\n\n🎯 Best Practices:\n1. Keep components small\n2. Use TypeScript\n3. Follow file conventions\n4. Optimize images with next/image\n\nWhat specific aspect would you like to explore?";
+    }
+    
+    // Python/AI related
+    if (input.includes('python') && input.includes('ai')) {
+      return "🐍 Python for AI/ML:\n\n📚 Best Libraries:\n• TensorFlow - Deep learning\n• PyTorch - Research & production\n• Scikit-learn - Classical ML\n• Pandas - Data manipulation\n• NumPy - Numerical computing\n\n🚀 Quick Start:\n```python\nimport tensorflow as tf\nmodel = tf.keras.Sequential()\n```\n\nWhich framework interests you most?";
+    }
+    
+    if (input.includes('ai') || input.includes('chatgpt') || input.includes('gpt') || input.includes('machine learning')) {
+      return "🤖 AI & Machine Learning:\n\n📊 Popular AI Tools:\n• ChatGPT - Conversational AI\n• DALL-E - Image generation\n• Claude - Advanced reasoning\n• Midjourney - Art creation\n• Stable Diffusion - Open source images\n\n💡 Key Concepts:\n• Prompt Engineering\n• Fine-tuning Models\n• RAG (Retrieval Augmented Gen)\n• Transfer Learning\n\nWant to build an AI project? I can help!";
+    }
+    
+    // Web Development
+    if (input.includes('frontend') || input.includes('web') && (input.includes('dev') || input.includes('build'))) {
+      return "🌐 Frontend Development:\n\n🎨 Modern Stack:\n• React / Vue / Svelte\n• Tailwind CSS for styling\n• Next.js for SSR\n• TypeScript for type safety\n\n📦 Essential Tools:\n• npm / yarn / pnpm\n• Vite for fast builds\n• ESLint for code quality\n• Prettier for formatting\n\nWould you like a code example?";
+    }
+    
+    // Backend
+    if (input.includes('backend') || input.includes('api') || input.includes('server')) {
+      return "⚙️ Backend Development:\n\n🔥 Popular Frameworks:\n• Node.js + Express\n• Python + FastAPI\n• Go + Gin\n• Rust + Actix\n\n📊 Databases:\n• PostgreSQL - Relational\n• MongoDB - Document\n• Redis - Cache\n• Firebase - BaaS\n\n🔐 REST API Best Practices:\n1. Use proper HTTP methods\n2. Implement authentication\n3. Handle errors gracefully\n4. Version your API\n\nNeed help with a specific backend task?";
+    }
+    
+    // Design/UI
+    if (input.includes('design') || input.includes('ui') || input.includes('ux') || input.includes('figma')) {
+      return "🎨 UI/UX Design:\n\n✨ Design Principles:\n• Consistency is key\n• Use whitespace wisely\n• Contrast for readability\n• Hierarchy guides users\n\n🛠️ Popular Tools:\n• Figma - Design & prototype\n• Framer - Interactive designs\n• Tailwind - Utility CSS\n• Radix - Accessible components\n\n📱 Design Trends:\n• Glassmorphism (frosted glass)\n• Gradients & soft colors\n• Minimal animations\n• Dark mode support\n\nWant design feedback?";
+    }
+    
+    // Mobile
+    if (input.includes('mobile') || input.includes('app') || input.includes('android') || input.includes('ios')) {
+      return "📱 Mobile App Development:\n\n🔧 Cross-Platform:\n• React Native - JavaScript\n• Flutter - Dart\n• Kotlin Multiplatform - Kotlin\n\n🍎 iOS:\n• SwiftUI\n• UIKit\n\n🤖 Android:\n• Jetpack Compose\n• Kotlin\n\n📲 App Ideas:\n• AI Assistant app\n• Health & fitness tracker\n• Social media tool\n• Productivity app\n\nWhat kind of mobile app would you like to build?";
+    }
+    
+    // Career
+    if (input.includes('career') || input.includes('job') || input.includes('interview') || input.includes('resume')) {
+      return "💼 Career Advice:\n\n📋 To Land a Great Job:\n1. Build a strong portfolio\n2. Contribute to open source\n3. Practice DSA & System Design\n4. Prepare behavioral questions\n\n🎯 Skills to Focus:\n• Full-stack development\n• Cloud platforms (AWS/GCP)\n• AI/ML basics\n• Soft skills\n\n📚 Learning Path:\n1. HTML/CSS/JavaScript\n2. React or Vue\n3. Backend (Node/Python)\n4. Database & DevOps\n\nWhere are you in your journey?";
+    }
+    
+    // Help
+    if (input.includes('help') || input.includes('how') || input.includes('what')) {
+      return "I can help you with:\n\n💻 **Coding & Development**\n• React, Vue, Angular\n• Node.js, Python, Go\n• APIs & Databases\n• DevOps & Cloud\n\n🎨 **Design**\n• UI/UX principles\n• Figma design\n• CSS & animations\n• Responsive design\n\n🤖 **AI & ML**\n• Machine learning\n• AI integration\n• Prompt engineering\n• Data science\n\n💼 **Career**\n• Job preparation\n• Portfolio building\n• Interview prep\n• Skill development\n\nWhat would you like to explore?";
+    }
+    
+    // Greeting
+    if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
+      return "👋 Hello! Great to meet you!\n\nI'm your AI assistant. I can help with:\n\n• 💻 Coding questions\n• 🎨 Design advice\n• 🤖 AI/ML topics\n• 💼 Career guidance\n• 📱 App development\n\nWhat would you like to know about today?";
+    }
+    
+    // Thanks
+    if (input.includes('thank') || input.includes('thanks')) {
+      return "You're welcome! 😊\n\nI'm always here to help. Feel free to ask:\n\n• More coding questions\n• Design tips\n• AI concepts\n• Career advice\n• Anything else!\n\nWhat else can I help you with?";
+    }
+    
+    // Default smart response
+    const topics = [
+      "That's an interesting topic! Could you tell me more about what you're trying to achieve?",
+      "Great question! Let me break that down for you step by step.",
+      "I'd be happy to help with that. Here's what I recommend:",
+      "That's a broad topic. Let me give you the key points:",
+      "Interesting! Here's my perspective on that:"
+    ];
+    
+    return `${topics[Math.floor(Math.random() * topics.length)]}\n\nBased on your question about "${userInput.substring(0, 50)}${userInput.length > 50 ? '...' : ''}", I suggest:\n\n1️⃣ Research the fundamentals\n2️⃣ Start with a simple example\n3️⃣ Practice with small projects\n4️⃣ Join communities for help\n\nWould you like me to elaborate on any specific part?`;
   };
 
   const handleSend = async () => {
@@ -70,11 +127,12 @@ function AIAssistant() {
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', content: input, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
-    setIsLoading(true);
+    setIsTyping(true);
     await new Promise(r => setTimeout(r, 1500));
-    const aiMsg: ChatMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: generateResponse(input), timestamp: new Date() };
+    const response = generateSmartResponse(input);
+    const aiMsg: ChatMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: response, timestamp: new Date() };
     setMessages(prev => [...prev, aiMsg]);
-    setIsLoading(false);
+    setIsTyping(false);
   };
 
   return (
@@ -82,275 +140,167 @@ function AIAssistant() {
       <div className="h-80 overflow-y-auto space-y-3 pr-2">
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'text-white' : ''}`} style={msg.role === 'user' ? {background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'} : {background: 'rgba(255,255,255,0.1)'}}>
+            <div className={`max-w-[85%] px-4 py-3 rounded-2xl ${msg.role === 'user' ? 'text-white' : ''}`} style={msg.role === 'user' ? {background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'} : {background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
               <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
             </div>
           </div>
         ))}
-        {isLoading && (<div className="flex justify-start"><div className="px-4 py-3 rounded-2xl" style={{background: 'rgba(255,255,255,0.1)'}}><div className="flex gap-1"><span className="w-2 h-2 rounded-full animate-bounce" style={{background: '#667eea'}} /><span className="w-2 h-2 rounded-full animate-bounce" style={{background: '#667eea', animationDelay: '150ms'}} /><span className="w-2 h-2 rounded-full animate-bounce" style={{background: '#667eea', animationDelay: '300ms'}} /></div></div></div>)}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="px-4 py-3 rounded-2xl" style={{background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+              <div className="flex gap-1">
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{background: 'rgba(99, 102, 241, 0.8)', animationDelay: '0ms'}} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{background: 'rgba(99, 102, 241, 0.8)', animationDelay: '150ms'}} />
+                <span className="w-2 h-2 rounded-full animate-bounce" style={{background: 'rgba(99, 102, 241, 0.8)', animationDelay: '300ms'}} />
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
       <div className="flex gap-2">
-        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask me anything..." className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} />
-        <button onClick={handleSend} disabled={!input.trim() || isLoading} className="px-6 py-3 rounded-xl font-semibold text-white transition-all" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}><Send size={20} /></button>
+        <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} placeholder="Ask me anything..." className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} />
+        <button onClick={handleSend} disabled={!input.trim() || isTyping} className="px-6 py-3 rounded-xl font-semibold text-white backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><Send size={20} /></button>
       </div>
     </div>
   );
 }
 
-// AI IMAGE GENERATOR
-function AIImageGenerator() {
-  const [prompt, setPrompt] = useState('');
-  const [generatedImages, setGeneratedImages] = useState<{url: string; prompt: string; seed: number}[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
+// Tasks Manager
+function TasksManager() {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 1, title: 'Complete API integration', priority: 'high', completed: false },
+    { id: 2, title: 'Design review meeting', priority: 'medium', completed: false },
+    { id: 3, title: 'Update documentation', priority: 'low', completed: true },
+    { id: 4, title: 'Deploy to production', priority: 'high', completed: false },
+  ]);
+  const [newTask, setNewTask] = useState('');
 
-  const generateImage = async () => {
-    if (!prompt.trim()) return;
-    setIsGenerating(true);
-    await new Promise(r => setTimeout(r, 3000));
-    const imageUrl = `https://picsum.photos/seed/${Date.now()}/512/512`;
-    setGeneratedImages(prev => [{ url: imageUrl, prompt, seed: Date.now() }, ...prev]);
-    setIsGenerating(false);
+  const addTask = () => {
+    if (!newTask.trim()) return;
+    setTasks([{ id: Date.now(), title: newTask, priority: 'medium', completed: false }, ...tasks]);
+    setNewTask('');
   };
+
+  const toggleTask = (id: number) => setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  const deleteTask = (id: number) => setTasks(tasks.filter(t => t.id !== id));
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <input type="text" value={prompt} onChange={(e) => setPrompt(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && generateImage()} placeholder="Describe your image..." className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} />
-        <button onClick={generateImage} disabled={!prompt.trim() || isGenerating} className="px-6 py-3 rounded-xl font-semibold text-white flex items-center gap-2" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-          {isGenerating ? <Loader2 size={20} className="animate-spin" /> : <Wand2 size={20} />}
-          {isGenerating ? 'Generating...' : 'Generate'}
-        </button>
+        <input value={newTask} onChange={(e) => setNewTask(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addTask()} placeholder="Add new task..." className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} />
+        <button onClick={addTask} className="px-6 py-3 rounded-xl font-semibold text-white backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><Plus size={20} /></button>
       </div>
-      <div className="grid grid-cols-2 gap-4 mt-6">
-        {generatedImages.map((img) => (
-          <motion.div key={img.seed} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative group">
-            <img src={img.url} alt={img.prompt} className="w-full rounded-xl" />
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
-              <button onClick={() => navigator.clipboard.writeText(img.prompt)} className="p-2 rounded-full" style={{background: 'rgba(255,255,255,0.2)'}}><Copy size={20} /></button>
-              <a href={img.url} target="_blank" className="p-2 rounded-full" style={{background: 'rgba(255,255,255,0.2)'}}><Download size={20} /></a>
-            </div>
-            <p className="text-xs text-gray-400 mt-2 truncate">{img.prompt}</p>
-          </motion.div>
+      <div className="space-y-2">
+        {tasks.map((task) => (
+          <div key={task.id} className="flex items-center gap-4 p-4 rounded-xl backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+            <button onClick={() => toggleTask(task.id)} className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${task.completed ? 'bg-emerald-500 border-emerald-500' : 'border-gray-500'}`}>
+              {task.completed && <Check size={14} className="text-white" />}
+            </button>
+            <span className={`flex-1 ${task.completed ? 'line-through text-gray-500' : ''}`}>{task.title}</span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${task.priority === 'high' ? 'bg-red-500/20 text-red-400' : task.priority === 'medium' ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'}`}>{task.priority}</span>
+            <button onClick={() => deleteTask(task.id)} className="p-2 hover:bg-red-500/20 rounded-lg" style={{color: '#ef4444'}}><Trash2 size={18} /></button>
+          </div>
         ))}
       </div>
-      {generatedImages.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
-          <Image className="w-16 h-16 mx-auto mb-4 opacity-50" />
-          <p>Enter a prompt and generate AI images</p>
-          <div className="mt-4 flex flex-wrap gap-2 justify-center">
-            {['Cyberpunk city', 'Abstract art', 'Nature landscape'].map((example) => (
-              <button key={example} onClick={() => setPrompt(example)} className="px-3 py-1 rounded-full text-xs" style={{background: 'rgba(255,255,255,0.1)'}}>{example}</button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-// SMART SEARCH
-function SmartSearch() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+// Projects Manager
+function ProjectsManager() {
+  const [projects, setProjects] = useState<Project[]>([
+    { id: 1, title: 'Website Redesign', progress: 75, status: 'active' },
+    { id: 2, title: 'Mobile App', progress: 45, status: 'active' },
+    { id: 3, title: 'API Integration', progress: 100, status: 'completed' },
+  ]);
+  const [newProject, setNewProject] = useState('');
 
-  const allContent: SearchResult[] = [
-    { id: 1, title: 'React Documentation', desc: 'Official React documentation and guides', category: 'Development', url: 'https://react.dev' },
-    { id: 2, title: 'Next.js 14 Features', desc: 'Server Components, App Router', category: 'Development', url: 'https://nextjs.org' },
-    { id: 3, title: 'TypeScript Handbook', desc: 'Complete guide to TypeScript', category: 'Development', url: 'https://typescriptlang.org' },
-    { id: 4, title: 'Tailwind CSS', desc: 'Utility-first CSS framework', category: 'Design', url: 'https://tailwindcss.com' },
-    { id: 5, title: 'OpenAI API', desc: 'Build AI with GPT-4', category: 'AI/ML', url: 'https://openai.com' },
-    { id: 6, title: 'ChatGPT Guide', desc: 'How to use ChatGPT', category: 'AI/ML', url: 'https://chat.openai.com' },
-  ];
-
-  const search = async () => {
-    if (!query.trim()) return;
-    setIsSearching(true);
-    setHasSearched(true);
-    await new Promise(r => setTimeout(r, 1000));
-    const searchResults = allContent.filter(item => item.title.toLowerCase().includes(query.toLowerCase()) || item.desc.toLowerCase().includes(query.toLowerCase()));
-    setResults(searchResults);
-    setIsSearching(false);
+  const addProject = () => {
+    if (!newProject.trim()) return;
+    setProjects([{ id: Date.now(), title: newProject, progress: 0, status: 'active' }, ...projects]);
+    setNewProject('');
   };
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && search()} placeholder="Search anything..." className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} />
-        <button onClick={search} disabled={!query.trim() || isSearching} className="px-6 py-3 rounded-xl" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-          {isSearching ? <Loader2 size={20} className="animate-spin text-white" /> : <Search size={20} className="text-white" />}
-        </button>
+        <input value={newProject} onChange={(e) => setNewProject(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addProject()} placeholder="New project..." className="flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} />
+        <button onClick={addProject} className="px-6 py-3 rounded-xl font-semibold text-white backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><Plus size={20} /></button>
       </div>
-      {!isSearching && hasSearched && (
-        <div className="mt-4 space-y-3">
-          {results.map((result) => (
-            <a key={result.id} href={result.url} target="_blank" className="block p-4 rounded-xl transition-colors" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>
-              <span className="px-2 py-1 rounded text-xs" style={{background: 'rgba(102, 126, 234, 0.3)', color: '#667eea'}}>{result.category}</span>
-              <h4 className="font-semibold mt-2">{result.title}</h4>
-              <p className="text-sm text-gray-400">{result.desc}</p>
-            </a>
-          ))}
-          {results.length === 0 && <p className="text-center text-gray-400 py-8">No results found</p>}
-        </div>
-      )}
+      <div className="space-y-4">
+        {projects.map((p) => (
+          <div key={p.id} className="p-6 rounded-xl backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-semibold">{p.title}</h4>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${p.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-400'}`}>{p.status}</span>
+            </div>
+            <div className="mb-2">
+              <div className="flex justify-between text-sm mb-1"><span className="text-gray-400">Progress</span><span style={{color: 'rgba(99, 102, 241, 0.9)'}}>{p.progress}%</span></div>
+              <div className="h-2 rounded-full backdrop-blur-xl" style={{background: 'rgba(148, 163, 184, 0.2)'}}><motion.div initial={{ width: 0 }} animate={{ width: `${p.progress}%` }} className="h-full rounded-full" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}} /></div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-// AI SUMMARIZE
-function AISummarize() {
-  const [inputText, setInputText] = useState('');
-  const [summary, setSummary] = useState('');
-  const [isSummarizing, setIsSummarizing] = useState(false);
+// Calendar Manager
+function CalendarManager() {
+  const [events, setEvents] = useState<Event[]>([
+    { id: 1, title: 'Team Meeting', date: 'Dec 20', time: '10:00 AM', type: 'meeting' },
+    { id: 2, title: 'Project Deadline', date: 'Dec 25', time: '11:59 PM', type: 'deadline' },
+    { id: 3, title: 'Code Review', date: 'Dec 18', time: '2:00 PM', type: 'meeting' },
+  ]);
+  const [newEvent, setNewEvent] = useState({ title: '', date: '', time: '' });
 
-  const summarize = async () => {
-    if (!inputText.trim()) return;
-    setIsSummarizing(true);
-    await new Promise(r => setTimeout(r, 2000));
-    const sentences = inputText.split(/[.!?]+/).filter(s => s.trim().length > 10);
-    const summaryText = sentences.slice(0, 3).join('. ');
-    setSummary(`📝 Summary:\n\n${summaryText || 'Could not generate summary.'}\n\n📊 Original: ${inputText.split(' ').length} words`);
-    setIsSummarizing(false);
-  };
-
-  return (
-    <div className="space-y-4">
-      <textarea value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Paste text to summarize..." className="w-full h-40 px-4 py-3 rounded-xl text-white placeholder-gray-400 resize-none focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} />
-      <button onClick={summarize} disabled={!inputText.trim() || isSummarizing} className="w-full py-3 rounded-xl font-semibold text-white" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-        {isSummarizing ? 'Summarizing...' : 'Summarize'}
-      </button>
-      {summary && <div className="p-4 rounded-xl" style={{background: 'rgba(102, 126, 234, 0.2)', border: '1px solid rgba(102, 126, 234, 0.3)'}}><pre className="whitespace-pre-wrap text-gray-300">{summary}</pre></div>}
-    </div>
-  );
-}
-
-// AI TRANSLATOR
-function AITranslator() {
-  const [inputText, setInputText] = useState('');
-  const [translatedText, setTranslatedText] = useState('');
-  const [sourceLang, setSourceLang] = useState('en');
-  const [targetLang, setTargetLang] = useState('es');
-  const [isTranslating, setIsTranslating] = useState(false);
-
-  const languages = [
-    { code: 'en', name: 'English' }, { code: 'es', name: 'Spanish' }, { code: 'fr', name: 'French' },
-    { code: 'de', name: 'German' }, { code: 'ja', name: 'Japanese' }, { code: 'ko', name: 'Korean' },
-    { code: 'zh', name: 'Chinese' }, { code: 'bn', name: 'Bengali' },
-  ];
-
-  const translate = async () => {
-    if (!inputText.trim()) return;
-    setIsTranslating(true);
-    await new Promise(r => setTimeout(r, 1500));
-    setTranslatedText(`[${languages.find(l => l.code === targetLang)?.name}] ${inputText}`);
-    setIsTranslating(false);
+  const addEvent = () => {
+    if (!newEvent.title || !newEvent.date) return;
+    setEvents([...events, { id: Date.now(), ...newEvent, type: 'meeting' }]);
+    setNewEvent({ title: '', date: '', time: '' });
   };
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)} className="px-4 py-3 rounded-xl text-white focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}}>
-          {languages.map((lang) => (<option key={lang.code} value={lang.code}>{lang.name}</option>))}
-        </select>
-        <select value={targetLang} onChange={(e) => setTargetLang(e.target.value)} className="px-4 py-3 rounded-xl text-white focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}}>
-          {languages.map((lang) => (<option key={lang.code} value={lang.code}>{lang.name}</option>))}
-        </select>
+        <input value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })} placeholder="Event title..." className="px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} />
+        <input type="date" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })} className="px-4 py-3 rounded-xl text-white backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} />
       </div>
-      <textarea value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Enter text..." className="w-full h-32 px-4 py-3 rounded-xl text-white placeholder-gray-400 resize-none focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} />
-      <button onClick={translate} disabled={!inputText.trim() || isTranslating} className="w-full py-3 rounded-xl font-semibold text-white" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-        {isTranslating ? 'Translating...' : 'Translate'}
-      </button>
-      {translatedText && <div className="p-4 rounded-xl" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}><p className="text-gray-300">{translatedText}</p></div>}
+      <button onClick={addEvent} className="w-full py-3 rounded-xl font-semibold text-white backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><Plus size={16} className="inline mr-2" /> Add Event</button>
+      <div className="space-y-2 max-h-80 overflow-y-auto">
+        {events.map((event) => (
+          <div key={event.id} className="flex items-center gap-4 p-4 rounded-xl backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><CalendarDays className="w-6 h-6 text-white" /></div>
+            <div className="flex-1"><h4 className="font-medium">{event.title}</h4><p className="text-xs text-gray-400">{event.date} at {event.time}</p></div>
+            <button onClick={() => setEvents(events.filter(e => e.id !== event.id))} className="p-2" style={{color: '#ef4444'}}><Trash2 size={18} /></button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-// AI OCR
-function AIOcr() {
-  const [image, setImage] = useState<string | null>(null);
-  const [extractedText, setExtractedText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      setImage(e.target?.result as string);
-      setIsProcessing(true);
-      await new Promise(r => setTimeout(r, 2500));
-      setExtractedText(`📄 Extracted Text:\n\nThis is sample text extracted from your image using OCR technology.\n\n✅ OCR completed successfully!`);
-      setIsProcessing(false);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <div className="space-y-4">
-      <div onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors" style={{borderColor: 'rgba(102, 126, 234, 0.5)'}}>
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} className="hidden" />
-        {image ? <img src={image} alt="Uploaded" className="max-h-48 mx-auto rounded-lg" /> : <><Scan className="w-12 h-12 mx-auto mb-4 text-gray-400" /><p className="text-gray-400">Click to upload image</p></>}
-      </div>
-      {isProcessing && <div className="text-center"><Loader2 className="w-8 h-8 mx-auto animate-spin" style={{color: '#667eea'}} /></div>}
-      {extractedText && <div className="p-4 rounded-xl" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}><pre className="whitespace-pre-wrap text-gray-300">{extractedText}</pre></div>}
-    </div>
-  );
-}
-
-// MAIN COMPONENT
+// Main Component
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [showChat, setShowChat] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [typedText, setTypedText] = useState('');
+  const [titleIndex, setTitleIndex] = useState(0);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ name: '', email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
-  const [activeAIModal, setActiveAIModal] = useState<string | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [typedText, setTypedText] = useState('');
-  const [titleIndex, setTitleIndex] = useState(0);
-  const [showChat, setShowChat] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(timer); }, []);
-
-  const titles = ['AI Engineer', 'Full Stack Developer', 'UI/UX Designer', 'Problem Solver'];
-  const skills: Skill[] = [
-    { name: 'React / Next.js', level: 96, color: 'from-cyan-400 to-blue-500' },
-    { name: 'TypeScript', level: 94, color: 'from-blue-400 to-indigo-500' },
-    { name: 'Node.js / Python', level: 90, color: 'from-green-400 to-emerald-500' },
-    { name: 'AI / Machine Learning', level: 88, color: 'from-purple-400 to-pink-500' },
-    { name: 'Cloud / DevOps', level: 85, color: 'from-orange-400 to-red-500' },
-    { name: 'UI/UX Design', level: 82, color: 'from-pink-400 to-rose-500' },
-  ];
-  const projects: Project[] = [
-    { id: 1, title: 'AI Portfolio v2', description: 'Next-gen AI-powered portfolio', tech: ['Next.js 14', 'GPT-4', 'Tailwind'], icon: Bot, gradient: 'from-violet-500 to-purple-600', demo: '#' },
-    { id: 2, title: 'Smart Home Hub', description: 'IoT dashboard with AI', tech: ['React', 'Node.js', 'AI'], icon: Zap, gradient: 'from-amber-500 to-orange-600', demo: '#' },
-    { id: 3, title: 'E-Learning Platform', description: 'AI-powered learning', tech: ['Next.js', 'OpenAI', 'Stripe'], icon: GraduationCap, gradient: 'from-emerald-500 to-teal-600', demo: '#' },
-    { id: 4, title: 'Analytics Dashboard', description: 'Real-time visualization', tech: ['React', 'D3.js', 'FastAPI'], icon: TrendingUp, gradient: 'from-blue-500 to-cyan-600', demo: '#' },
-  ];
-  const features: Feature[] = [
-    { icon: Bot, title: 'AI Assistant', description: 'Ask anything', color: 'violet', modal: 'assistant' },
-    { icon: Wand2, title: 'Image Generation', description: 'Create images', color: 'pink', modal: 'image' },
-    { icon: Search, title: 'Smart Search', description: 'Search anything', color: 'cyan', modal: 'search' },
-    { icon: FileText, title: 'Auto Summarize', description: 'Summarize content', color: 'amber', modal: 'summarize' },
-    { icon: Languages, title: 'Translation', description: 'Translate 8+ languages', color: 'emerald', modal: 'translate' },
-    { icon: Scan, title: 'AI OCR', description: 'Extract text', color: 'blue', modal: 'ocr' },
-  ];
-  const navItems = ['Home', 'About', 'Projects', 'Dashboard', 'Blog', 'Contact'];
-
-  useEffect(() => { const interval = setInterval(() => setTitleIndex((prev) => (prev + 1) % titles.length), 3000); return () => clearInterval(interval); }, []);
-  useEffect(() => { let currentIndex = 0; const currentTitle = titles[titleIndex]; setTypedText(''); const typeInterval = setInterval(() => { if (currentIndex <= currentTitle.length) { setTypedText(currentTitle.slice(0, currentIndex)); currentIndex++; } else clearInterval(typeInterval); }, 80); return () => clearInterval(typeInterval); }, [titleIndex]);
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages]);
+  useEffect(() => { const interval = setInterval(() => setTitleIndex((prev) => (prev + 1) % ['AI Engineer', 'Full Stack Developer', 'UI/UX Designer', 'Problem Solver'].length), 3000); return () => clearInterval(interval); }, []);
+  useEffect(() => { let currentIndex = 0; const currentTitle = ['AI Engineer', 'Full Stack Developer', 'UI/UX Designer', 'Problem Solver'][titleIndex]; setTypedText(''); const typeInterval = setInterval(() => { if (currentIndex <= currentTitle.length) { setTypedText(currentTitle.slice(0, currentIndex)); currentIndex++; } else clearInterval(typeInterval); }, 80); return () => clearInterval(typeInterval); }, [titleIndex]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -361,8 +311,8 @@ export default function Home() {
     setAuthLoading(true);
     await new Promise(r => setTimeout(r, 1500));
     setIsLoggedIn(true);
-    setAuthUser({ name: loginForm.email.split('@')[0], email: loginForm.email, avatar: '👤', loginTime: new Date() });
     setShowLoginModal(false);
+    setShowChat(true); // Open chat after login
     setAuthLoading(false);
   };
 
@@ -376,109 +326,71 @@ export default function Home() {
     setAuthLoading(true);
     await new Promise(r => setTimeout(r, 1500));
     setIsLoggedIn(true);
-    setAuthUser({ name: signupForm.name, email: signupForm.email, avatar: '👤', loginTime: new Date() });
     setShowSignupModal(false);
+    setShowChat(true); // Open chat after signup
     setAuthLoading(false);
   };
 
-  const handleLogout = () => { setIsLoggedIn(false); setAuthUser(null); };
-
-  const handleChat = async () => {
-    if (!chatInput.trim()) return;
-    const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: chatInput, timestamp: new Date() };
-    setChatMessages(prev => [...prev, userMessage]);
-    setChatInput('');
-    setIsTyping(true);
-    await new Promise(r => setTimeout(r, 1500));
-    const responses = ["I'm Shawon AI! I can help with coding, design, or any questions.", "Great! I specialize in React, Next.js, AI, and web development.", "I love building AI-powered applications!"];
-    const aiMessage: ChatMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: responses[Math.floor(Math.random() * responses.length)], timestamp: new Date() };
-    setIsTyping(false);
-    setChatMessages(prev => [...prev, aiMessage]);
+  const modalTitles: Record<string, string> = {
+    'tasks': '✅ Tasks Manager',
+    'projects': '📁 Projects',
+    'calendar': '📅 Calendar',
   };
 
-  const renderAIModalContent = () => {
-    switch (activeAIModal) {
-      case 'assistant': return <AIAssistant />;
-      case 'image': return <AIImageGenerator />;
-      case 'search': return <SmartSearch />;
-      case 'summarize': return <AISummarize />;
-      case 'translate': return <AITranslator />;
-      case 'ocr': return <AIOcr />;
+  const renderModalContent = () => {
+    switch (activeModal) {
+      case 'tasks': return <TasksManager />;
+      case 'projects': return <ProjectsManager />;
+      case 'calendar': return <CalendarManager />;
       default: return null;
     }
   };
 
-  const getAIModalTitle = () => {
-    switch (activeAIModal) {
-      case 'assistant': return '🤖 Shawon AI Assistant';
-      case 'image': return '🎨 AI Image Generator';
-      case 'search': return '🔍 Smart Search';
-      case 'summarize': return '📝 AI Summarize';
-      case 'translate': return '🌐 AI Translator';
-      case 'ocr': return '📄 AI OCR';
-      default: return '';
-    }
-  };
-
   return (
-    <div className="min-h-screen text-white overflow-x-hidden" style={{background: 'linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 50%, #0f1a3a 100%)'}}>
+    <div className="min-h-screen text-white overflow-x-hidden" style={{background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)'}}>
       {/* Animated Background */}
-      <div className="fixed inset-0 z-[-1] overflow-hidden">
-        <motion.div animate={{ x: [0, 100, 0], y: [0, -50, 0] }} transition={{ duration: 20, repeat: Infinity }} className="absolute w-[600px] h-[600px] rounded-full" style={{background: 'radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%)', top: '10%', left: '10%'}} />
-        <motion.div animate={{ x: [0, -100, 0], y: [0, 50, 0] }} transition={{ duration: 15, repeat: Infinity }} className="absolute w-[500px] h-[500px] rounded-full" style={{background: 'radial-gradient(circle, rgba(236, 72, 153, 0.25) 0%, transparent 70%)', top: '50%', right: '10%'}} />
-        <motion.div animate={{ x: [0, 50, 0], y: [0, 100, 0] }} transition={{ duration: 25, repeat: Infinity }} className="absolute w-[400px] h-[400px] rounded-full" style={{background: 'radial-gradient(circle, rgba(34, 211, 238, 0.2) 0%, transparent 70%)', bottom: '10%', left: '30%'}} />
+      <div className="fixed inset-0 z-[-1]">
+        <motion.div animate={{ x: [0, 100, 0], y: [0, -50, 0] }} transition={{ duration: 20, repeat: Infinity }} className="absolute w-[600px] h-[600px] rounded-full" style={{background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)', top: '10%', left: '10%'}} />
+        <motion.div animate={{ x: [0, -100, 0], y: [0, 50, 0] }} transition={{ duration: 15, repeat: Infinity }} className="absolute w-[500px] h-[500px] rounded-full" style={{background: 'radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%)', top: '50%', right: '10%'}} />
+        <motion.div animate={{ x: [0, 50, 0], y: [0, 100, 0] }} transition={{ duration: 25, repeat: Infinity }} className="absolute w-[400px] h-[400px] rounded-full" style={{background: 'radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%)', bottom: '10%', left: '30%'}} />
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{background: 'rgba(10, 10, 15, 0.8)', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{background: 'rgba(15, 23, 42, 0.8)', borderBottom: '1px solid rgba(148, 163, 184, 0.1)'}}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-xl font-bold cursor-pointer" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-xl font-bold cursor-pointer" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
               Shawon Haque
             </motion.div>
             
-            {/* Search Bar */}
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="hidden lg:flex items-center flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type="text" placeholder="Search..." className="w-full pl-10 pr-4 py-2 rounded-full text-sm text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)'}} onClick={() => setActiveAIModal('search')} readOnly />
-              </div>
-            </motion.div>
-            
             <div className="hidden md:flex items-center space-x-8">
-              {navItems.map((item, i) => (
-                <motion.a key={item} href={item === 'Dashboard' ? '/dashboard' : `#${item.toLowerCase()}`} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+              {['Home', 'About', 'Projects', 'Dashboard', 'Blog', 'Contact'].map((item, i) => (
+                <motion.a key={item} href={`#${item.toLowerCase()}`} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
                   {item}
                 </motion.a>
               ))}
             </div>
 
-            {/* Clock - Right Side */}
-            <div className="flex items-center gap-4">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 px-3 py-2 rounded-full" style={{background: 'rgba(255,255,255,0.1)'}}>
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-mono text-gray-300">{currentTime.toLocaleTimeString()}</span>
-              </motion.div>
-
+            <div className="flex items-center space-x-3">
               {isLoggedIn ? (
                 <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full" style={{background: 'rgba(255,255,255,0.1)'}}>
-                    <span>{authUser?.avatar}</span>
-                    <span className="text-sm text-gray-300">{authUser?.name}</span>
+                  <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+                    <span>👤</span>
+                    <span className="text-sm text-gray-300">Shawon</span>
                   </div>
-                  <button onClick={handleLogout} className="p-2 rounded-lg" style={{background: 'rgba(255,255,255,0.1)'}}><LogOut size={20} /></button>
+                  <button onClick={() => { setIsLoggedIn(false); setShowChat(false); }} className="p-2 rounded-lg backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}><LogOut size={20} /></button>
                 </div>
               ) : (
                 <>
                   <button onClick={() => setShowLoginModal(true)} className="hidden sm:block text-sm font-medium text-gray-300 hover:text-white">Sign In</button>
-                  <button onClick={() => setShowSignupModal(true)} className="px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>Sign Up</button>
+                  <button onClick={() => setShowSignupModal(true)} className="px-4 py-2 rounded-lg text-sm font-semibold text-white backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}>Sign Up</button>
                 </>
               )}
-              <button onClick={() => setShowChat(!showChat)} className="p-2 rounded-lg relative" style={{background: 'rgba(255,255,255,0.1)'}}>
+              <button onClick={() => setShowChat(!showChat)} className="p-2 rounded-lg backdrop-blur-xl relative" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
                 <Bot size={20} />
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse" style={{background: '#ec4899'}} />
               </button>
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 rounded-lg" style={{background: 'rgba(255,255,255,0.1)'}}><MenuIcon size={24} /></button>
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 rounded-lg backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}><MenuIcon size={24} /></button>
             </div>
           </div>
         </div>
@@ -486,10 +398,10 @@ export default function Home() {
         {/* Mobile Menu */}
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="md:hidden" style={{background: 'rgba(10, 10, 15, 0.95)', borderTop: '1px solid rgba(255,255,255,0.1)'}}>
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="md:hidden" style={{background: 'rgba(15, 23, 42, 0.95)', borderTop: '1px solid rgba(148, 163, 184, 0.1)'}}>
               <div className="px-4 py-4 space-y-2">
-                {navItems.map((item) => (<a key={item} href={item === 'Dashboard' ? '/dashboard' : `#${item.toLowerCase()}`} className="block px-4 py-2 rounded-lg text-gray-300" style={{background: 'rgba(255,255,255,0.05)'}} onClick={() => setIsMenuOpen(false)}>{item}</a>))}
-                <div className="flex items-center gap-2 px-4 pt-2"><Clock className="w-4 h-4 text-gray-400" /><span className="text-sm text-gray-400">{currentTime.toLocaleTimeString()}</span></div>
+                {['Home', 'About', 'Projects', 'Dashboard', 'Blog', 'Contact'].map((item) => (<a key={item} href={`#${item.toLowerCase()}`} className="block px-4 py-2 rounded-lg text-gray-300 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.4)'}} onClick={() => setIsMenuOpen(false)}>{item}</a>))}
+                {!isLoggedIn && <button onClick={() => { setIsMenuOpen(false); setShowLoginModal(true); }} className="w-full text-left px-4 py-2 text-indigo-400">Sign In</button>}
               </div>
             </motion.div>
           )}
@@ -501,42 +413,42 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8 }} className="mb-8">
             <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} className="relative inline-block">
-              <div className="w-44 h-44 rounded-full p-1" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'}}>
-                <div className="w-full h-full rounded-full flex items-center justify-center text-6xl" style={{background: '#0a0a0f'}}>👨‍💻</div>
+              <div className="w-44 h-44 rounded-full backdrop-blur-xl p-1" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}>
+                <div className="w-full h-full rounded-full flex items-center justify-center text-6xl" style={{background: 'linear-gradient(135deg, #0f172a, #1e1b4b)'}}>👨‍💻</div>
               </div>
-              <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute -bottom-2 -right-2 w-14 h-14 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)'}}>
-                <Sparkles className="w-7 h-7 text-white" />
+              <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute -bottom-2 -right-2 w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(239, 68, 68, 0.9))'}}>
+                <Sparkle className="w-7 h-7 text-white" />
               </motion.div>
             </motion.div>
           </motion.div>
 
-          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-5xl md:text-7xl font-bold mb-4" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-5xl md:text-7xl font-bold mb-4" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
             Shawon Haque
           </motion.h1>
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="h-14 mb-8">
-            <span className="text-2xl md:text-4xl text-gray-300">{typedText}<span className="animate-pulse" style={{color: '#667eea'}}>|</span></span>
+            <span className="text-2xl md:text-4xl text-gray-300">{typedText}<span className="animate-pulse" style={{color: 'rgba(99, 102, 241, 0.9)'}}>|</span></span>
           </motion.div>
 
           <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-12">
-            Building the future with <span className="font-semibold" style={{color: '#667eea'}}>AI</span>. Creating innovative solutions with cutting-edge technology.
+            Building the future with <span className="font-semibold" style={{color: 'rgba(99, 102, 241, 0.9)'}}>AI</span>. Creating innovative solutions with cutting-edge technology.
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="flex flex-wrap justify-center gap-4 mb-12">
-            <a href="#projects" className="px-8 py-4 rounded-xl font-semibold text-white flex items-center gap-2 shadow-lg" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: '0 10px 40px rgba(102, 126, 234, 0.4)'}}><Rocket size={20} /> View Projects</a>
-            <a href="/dashboard" className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}}><LayoutDashboard size={20} /> Dashboard</a>
+            <a href="#projects" className="px-8 py-4 rounded-xl font-semibold text-white shadow-lg backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', boxShadow: '0 10px 40px rgba(99, 102, 241, 0.4)'}}><Rocket size={20} className="inline mr-2" /> View Projects</a>
+            <a href="#dashboard" className="px-8 py-4 rounded-xl font-semibold backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}}><LayoutDashboard size={20} className="inline mr-2" /> Dashboard</a>
           </motion.div>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="flex justify-center gap-6 mb-12">
             {[Github, Linkedin, Twitter].map((Icon, i) => (
-              <motion.a key={i} href="#" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 + i * 0.1 }} className="p-4 rounded-full" style={{background: 'rgba(255,255,255,0.1)'}}><Icon size={24} /></motion.a>
+              <motion.a key={i} href="#" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 + i * 0.1 }} className="p-4 rounded-full backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}><Icon size={24} /></motion.a>
             ))}
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
             {[{ number: '50+', label: 'Projects' }, { number: '30+', label: 'Clients' }, { number: '5+', label: 'Years Exp' }, { number: '30+', label: 'Technologies' }].map((stat, i) => (
-              <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.2 + i * 0.1 }} className="rounded-xl p-6" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>
-                <div className="text-3xl font-bold mb-1" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>{stat.number}</div>
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.2 + i * 0.1 }} className="rounded-xl p-6 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+                <div className="text-3xl font-bold mb-1" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>{stat.number}</div>
                 <div className="text-gray-400 text-sm">{stat.label}</div>
               </motion.div>
             ))}
@@ -551,18 +463,18 @@ export default function Home() {
       {/* About Section */}
       <section id="about" className="py-32 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-16" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>About Me</motion.h2>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-16" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>About Me</motion.h2>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} className="space-y-6">
-              <p className="text-lg text-gray-300">I'm a <span className="font-semibold" style={{color: '#667eea'}}>AI Engineer</span> and <span className="font-semibold" style={{color: '#764ba2'}}>Full-Stack Developer</span> passionate about modern web applications.</p>
+              <p className="text-lg text-gray-300">I'm a <span className="font-semibold" style={{color: 'rgba(99, 102, 241, 0.9)'}}>AI Engineer</span> and <span className="font-semibold" style={{color: 'rgba(168, 85, 247, 0.9)'}}>Full-Stack Developer</span> passionate about modern web applications.</p>
               <p className="text-lg text-gray-400">I transform complex problems into elegant solutions using React, Next.js, Node.js, Python, and AI.</p>
-              <div className="flex flex-wrap gap-3">{['Problem Solver', 'Team Player', 'Fast Learner'].map((trait) => (<span key={trait} className="px-4 py-2 rounded-full text-sm" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>{trait}</span>))}</div>
+              <div className="flex flex-wrap gap-3">{['Problem Solver', 'Team Player', 'Fast Learner'].map((trait) => (<span key={trait} className="px-4 py-2 rounded-full text-sm backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>{trait}</span>))}</div>
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} className="space-y-6">
-              {skills.map((skill, i) => (
+              {[{ name: 'React / Next.js', level: 96 }, { name: 'TypeScript', level: 94 }, { name: 'Node.js / Python', level: 90 }, { name: 'AI / ML', level: 88 }].map((skill, i) => (
                 <div key={skill.name} className="space-y-2">
                   <div className="flex justify-between text-sm"><span className="font-medium">{skill.name}</span><span className="text-gray-400">{skill.level}%</span></div>
-                  <div className="h-3 rounded-full overflow-hidden" style={{background: 'rgba(255,255,255,0.1)'}}><motion.div initial={{ width: 0 }} whileInView={{ width: `${skill.level}%` }} transition={{ duration: 1, delay: i * 0.1 }} className="h-full rounded-full" style={{background: `linear-gradient(90deg, ${skill.color.split(' ')[1].replace('to-', '')}, ${skill.color.split(' ')[3]})`}} /></div>
+                  <div className="h-3 rounded-full backdrop-blur-xl" style={{background: 'rgba(148, 163, 184, 0.2)'}}><motion.div initial={{ width: 0 }} whileInView={{ width: `${skill.level}%` }} transition={{ duration: 1, delay: i * 0.1 }} className="h-full rounded-full" style={{background: 'linear-gradient(90deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}} /></div>
                 </div>
               ))}
             </motion.div>
@@ -573,124 +485,104 @@ export default function Home() {
       {/* Projects Section */}
       <section id="projects" className="py-32 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-4" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Featured Projects</motion.h2>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-center text-gray-400 mb-16">AI integration, modern design, cutting-edge technology</motion.p>
-          <div className="grid md:grid-cols-2 gap-8">{projects.map((project, i) => (
-            <motion.div key={project.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="rounded-2xl overflow-hidden" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>
-              <div className={`h-48 flex items-center justify-center bg-gradient-to-br ${project.gradient}`}><project.icon className="w-20 h-20 text-white/80" /></div>
-              <div className="p-6"><h3 className="text-xl font-bold mb-2">{project.title}</h3><p className="text-gray-400 mb-4">{project.description}</p><div className="flex flex-wrap gap-2 mb-4">{project.tech.map((tech) => (<span key={tech} className="px-3 py-1 rounded-full text-xs" style={{background: 'rgba(255,255,255,0.1)'}}>{tech}</span>))}</div><a href={project.demo} className="inline-flex items-center gap-2" style={{color: '#667eea'}}>View Demo <ExternalLink size={16} /></a></div>
-            </motion.div>
-          ))}</div>
-        </div>
-      </section>
-
-      {/* AI Features Section */}
-      <section className="py-32 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-4" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>✨ AI-Powered Features</motion.h2>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-center text-gray-400 mb-16">All features FULLY FUNCTIONAL! Click to try.</motion.p>
-          <div className="grid md:grid-cols-3 gap-6">{features.map((feature, i) => (
-            <motion.div key={feature.title} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} onClick={() => setActiveAIModal(feature.modal)} className="rounded-2xl p-8 cursor-pointer transition-all hover:scale-105" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6" style={{background: 'rgba(102, 126, 234, 0.2)'}}><feature.icon className="w-7 h-7" style={{color: '#667eea'}} /></div>
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-gray-400">{feature.description}</p>
-              <p className="text-xs mt-4" style={{color: '#667eea'}}>✨ Click to use</p>
-            </motion.div>
-          ))}</div>
-        </div>
-      </section>
-
-      {/* Dashboard Preview Section */}
-      <section id="dashboard" className="py-32 px-4" style={{background: 'rgba(0,0,0,0.3)'}}>
-        <div className="max-w-6xl mx-auto">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-4" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>🎯 Personal Dashboard</motion.h2>
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-center text-gray-400 mb-16">All your tools in one place</motion.p>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            {[{ icon: FileText, title: 'Documents' }, { icon: Calendar, title: 'Calendar' }, { icon: FolderKanban, title: 'Projects' }, { icon: Image, title: 'Gallery' }, { icon: MessageSquare, title: 'AI Chat' }, { icon: Bell, title: 'Notifications' }, { icon: Bookmark, title: 'Bookmarks' }, { icon: Lock, title: 'Password Vault' }, { icon: Music, title: 'Music' }, { icon: QrCode, title: 'QR Code' }].map((item, i) => (
-              <motion.a key={item.title} href="/dashboard" initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} whileHover={{ scale: 1.05 }} className="rounded-2xl p-6 text-center transition-all" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>
-                <div className="w-14 h-14 mx-auto rounded-xl flex items-center justify-center mb-4" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}><item.icon className="w-7 h-7 text-white" /></div>
-                <h3 className="font-bold text-sm">{item.title}</h3>
-              </motion.a>
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-16" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Featured Projects</motion.h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[{ id: 1, title: 'AI Portfolio', desc: 'Next-gen AI-powered portfolio', tech: ['Next.js 14', 'GPT-4', 'Tailwind'] }, { id: 2, title: 'Smart Home Hub', desc: 'IoT dashboard with AI', tech: ['React', 'Node.js', 'AI'] }, { id: 3, title: 'E-Learning Platform', desc: 'AI-powered learning system', tech: ['Next.js', 'OpenAI', 'Stripe'] }, { id: 4, title: 'Analytics Dashboard', desc: 'Real-time visualization', tech: ['React', 'D3.js', 'FastAPI'] }].map((project, i) => (
+              <motion.div key={project.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="rounded-2xl overflow-hidden backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+                <div className="h-48 flex items-center justify-center" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3))'}}><Bot className="w-20 h-20 text-white/80" /></div>
+                <div className="p-6"><h3 className="text-xl font-bold mb-2">{project.title}</h3><p className="text-gray-400 mb-4">{project.desc}</p><div className="flex flex-wrap gap-2 mb-4">{project.tech.map((tech) => (<span key={tech} className="px-3 py-1 rounded-full text-xs backdrop-blur-xl" style={{background: 'rgba(148, 163, 184, 0.1)'}}>{tech}</span>))}</div><a href="#" className="inline-flex items-center gap-2" style={{color: 'rgba(99, 102, 241, 0.9)'}}>View Demo <ExternalLink size={16} /></a></div>
+              </motion.div>
             ))}
           </div>
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-center">
-            <a href="/dashboard" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white shadow-lg" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', boxShadow: '0 10px 40px rgba(102, 126, 234, 0.4)'}}><LayoutDashboard size={20} /> Open Dashboard</a>
+        </div>
+      </section>
+
+      {/* Dashboard Section */}
+      <section id="dashboard" className="py-32 px-4" style={{background: 'rgba(0, 0, 0, 0.3)'}}>
+        <div className="max-w-6xl mx-auto">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-16" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>🎯 Personal Dashboard</motion.h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+            {[{ icon: Target, title: 'Tasks', id: 'tasks' }, { icon: Folder, title: 'Projects', id: 'projects' }, { icon: CalendarDays, title: 'Calendar', id: 'calendar' }, { icon: Image, title: 'Gallery' }, { icon: Bookmark, title: 'Bookmarks' }, { icon: Lock, title: 'Passwords' }].map((item, i) => (
+              <motion.button key={item.title} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} whileHover={{ scale: 1.05 }} onClick={() => item.id && setActiveModal(item.id)} className="rounded-2xl p-6 text-center backdrop-blur-xl transition-all" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+                <div className="w-14 h-14 mx-auto rounded-xl flex items-center justify-center mb-4" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><item.icon className="w-7 h-7 text-white" /></div>
+                <h3 className="font-bold text-sm">{item.title}</h3>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-32 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-8" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Get In Touch</motion.h2>
+          
+          {/* Clock Above Contact */}
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-4 mb-12">
+            <div className="px-6 py-3 rounded-full backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+              <span className="text-sm text-gray-400">Current Time: </span>
+              <span className="text-lg font-mono" style={{color: 'rgba(99, 102, 241, 0.9)'}}>{currentTime.toLocaleTimeString()}</span>
+            </div>
+          </motion.div>
+          
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} className="rounded-2xl p-8 md:p-12 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+            <form className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div><label className="block text-sm font-medium text-gray-300 mb-2">Name</label><input type="text" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} placeholder="Your name" /></div>
+                <div><label className="block text-sm font-medium text-gray-300 mb-2">Email</label><input type="email" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} placeholder="you@example.com" /></div>
+              </div>
+              <div><label className="block text-sm font-medium text-gray-300 mb-2">Message</label><textarea rows={5} className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl resize-none focus:outline-none" style={{background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} placeholder="Your message..." /></div>
+              <button type="submit" className="w-full py-4 rounded-xl font-semibold text-white backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}>Send Message</button>
+            </form>
           </motion.div>
         </div>
       </section>
 
-      {/* Blog Section */}
-      <section id="blog" className="py-32 px-4">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-16" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Blog Posts</motion.h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[{ id: 1, title: 'Building AI Apps', date: 'Dec 15', readTime: '5 min', category: 'AI', image: '🤖' }, { id: 2, title: 'Modern Web Architecture', date: 'Dec 10', readTime: '8 min', category: 'Dev', image: '💻' }, { id: 3, title: 'Design Best Practices', date: 'Dec 5', readTime: '6 min', category: 'Design', image: '🎨' }].map((post, i) => (
-              <motion.article key={post.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="rounded-2xl overflow-hidden" style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)'}}>
-                <div className="h-48 flex items-center justify-center text-6xl" style={{background: 'linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%)'}}>{post.image}</div>
-                <div className="p-6"><div className="flex items-center gap-4 text-sm text-gray-400 mb-3"><span>{post.date}</span><span>•</span><span>{post.readTime}</span><span className="px-2 py-1 rounded text-xs" style={{background: 'rgba(102,126,234,0.3)', color: '#667eea'}}>{post.category}</span></div><h3 className="text-lg font-bold mb-2">{post.title}</h3><a href="#" className="inline-flex items-center gap-2 text-sm" style={{color: '#667eea'}}>Read More <ChevronDown size={16} className="rotate-270" /></a></div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="py-12 px-4" style={{borderTop: '1px solid rgba(255,255,255,0.1)'}}>
+      <footer className="py-12 px-4" style={{borderTop: '1px solid rgba(148, 163, 184, 0.1)'}}>
         <div className="max-w-6xl mx-auto text-center">
-          <h3 className="text-xl font-bold mb-2" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Shawon Haque</h3>
+          <h3 className="text-xl font-bold mb-2" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Shawon Haque</h3>
           <p className="text-gray-400 text-sm mb-6">Building the future with AI.</p>
-          <div className="flex justify-center gap-4 mb-8">{[Github, Linkedin, Twitter, Mail].map((Icon, i) => (<a key={i} href="#" className="p-3 rounded-full" style={{background: 'rgba(255,255,255,0.1)'}}><Icon size={20} /></a>))}</div>
+          <div className="flex justify-center gap-4 mb-8">{[Github, Linkedin, Twitter, Mail].map((Icon, i) => (<a key={i} href="#" className="p-3 rounded-full backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}><Icon size={20} /></a>))}</div>
           <p className="text-gray-500 text-sm">© 2024 Shawon Haque. All rights reserved.</p>
         </div>
       </footer>
 
-      {/* AI Chat Widget */}
+      {/* Smart Chat Widget */}
       <AnimatePresence>
         {showChat && (
-          <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8, y: 20 }} className="fixed bottom-24 right-4 w-96 max-w-[calc(100vw-32px)] h-[500px] rounded-2xl overflow-hidden shadow-2xl z-50" style={{background: 'rgba(15, 15, 25, 0.95)', border: '1px solid rgba(255,255,255,0.2)'}}>
-            <div className="p-4 flex items-center justify-between" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>
-              <div className="flex items-center gap-3"><Bot size={24} /><div><h4 className="font-semibold">Shawon AI</h4><p className="text-xs text-white/70">Always here</p></div></div>
+          <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.8, y: 20 }} className="fixed bottom-24 right-4 w-96 max-w-[calc(100vw-32px)] h-[500px] rounded-2xl overflow-hidden shadow-2xl z-50" style={{background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(148, 163, 184, 0.2)'}}>
+            <div className="p-4 flex items-center justify-between backdrop-blur-xl" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}>
+              <div className="flex items-center gap-3"><Bot size={24} /><div><h4 className="font-semibold">Shawon AI</h4><p className="text-xs text-white/70">Smart Assistant</p></div></div>
               <button onClick={() => setShowChat(false)} className="p-2 rounded-lg" style={{background: 'rgba(255,255,255,0.2)'}}><X size={20} /></button>
             </div>
-            <div className="h-[calc(100%-140px)] overflow-y-auto p-4 space-y-3">
-              {chatMessages.length === 0 && <div className="text-center text-gray-400 py-8"><Bot className="w-12 h-12 mx-auto mb-4 opacity-50" /><p>Ask me anything!</p></div>}
-              {chatMessages.map((message) => (<div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm ${message.role === 'user' ? 'text-white' : ''}`} style={message.role === 'user' ? {background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'} : {background: 'rgba(255,255,255,0.1)'}}>{message.content}</div></div>))}
-              {isTyping && (<div className="flex justify-start"><div className="px-4 py-3 rounded-2xl" style={{background: 'rgba(255,255,255,0.1)'}}><div className="flex gap-1"><span className="w-2 h-2 rounded-full animate-bounce" style={{background: '#667eea'}} /><span className="w-2 h-2 rounded-full animate-bounce" style={{background: '#667eea', animationDelay: '150ms'}} /><span className="w-2 h-2 rounded-full animate-bounce" style={{background: '#667eea', animationDelay: '300ms'}} /></div></div></div>)}
-              <div ref={chatEndRef} />
-            </div>
-            <div className="p-4" style={{borderTop: '1px solid rgba(255,255,255,0.1)'}}>
-              <div className="flex gap-2">
-                <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleChat()} placeholder="Ask..." className="flex-1 px-4 py-3 rounded-xl text-sm text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)'}} />
-                <button onClick={handleChat} className="px-4 py-3 rounded-xl" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}><Send size={20} /></button>
-              </div>
+            <div className="h-[calc(100%-140px)] overflow-y-auto p-4">
+              <SmartChatbot />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* AI Modals */}
-      <Modal isOpen={!!activeAIModal} onClose={() => setActiveAIModal(null)} title={getAIModalTitle()}>{renderAIModalContent()}</Modal>
-
       {/* Login Modal */}
       <AnimatePresence>
         {showLoginModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLoginModal(false)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-md rounded-2xl p-8" style={{background: 'rgba(15, 15, 25, 0.95)', border: '1px solid rgba(255,255,255,0.2)'}} onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-md rounded-2xl p-8 backdrop-blur-xl" style={{background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(148, 163, 184, 0.2)'}} onClick={(e) => e.stopPropagation()}>
               <div className="text-center mb-8">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}><User className="w-8 h-8 text-white" /></div>
-                <h2 className="text-2xl font-bold" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Welcome Back</h2>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}><User className="w-8 h-8 text-white" /></div>
+                <h2 className="text-2xl font-bold" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Welcome Back</h2>
                 <p className="text-gray-400 mt-2">Sign in to continue</p>
               </div>
               <form onSubmit={handleLogin} className="space-y-4">
-                <input type="email" value={loginForm.email} onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })} placeholder="Email" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} required />
+                <input type="email" value={loginForm.email} onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })} placeholder="Email" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} required />
                 <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Password" className="w-full px-4 py-3 pr-12 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} required />
+                  <input type={showPassword ? 'text' : 'password'} value={loginForm.password} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} placeholder="Password" className="w-full px-4 py-3 pr-12 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} required />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}</button>
                 </div>
                 {authError && <p className="text-red-400 text-sm">{authError}</p>}
-                <button type="submit" disabled={authLoading} className="w-full py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}>{authLoading ? <Loader2 className="animate-spin" size={20} /> : <LogIn size={20} />}{authLoading ? 'Signing in...' : 'Sign In'}</button>
+                <button type="submit" disabled={authLoading} className="w-full py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))'}}>{authLoading ? <Loader2 className="animate-spin" size={20} /> : <LogIn size={20} />}{authLoading ? 'Signing in...' : 'Sign In'}</button>
               </form>
-              <p className="text-center text-gray-400 text-sm mt-6">Don't have account? <button onClick={() => { setShowLoginModal(false); setShowSignupModal(true); }} className="hover:underline" style={{color: '#667eea'}}>Sign up</button></p>
+              <p className="text-center text-gray-400 text-sm mt-6">Don't have account? <button onClick={() => { setShowLoginModal(false); setShowSignupModal(true); }} className="hover:underline" style={{color: 'rgba(99, 102, 241, 0.9)'}}>Sign up</button></p>
             </motion.div>
           </motion.div>
         )}
@@ -700,28 +592,27 @@ export default function Home() {
       <AnimatePresence>
         {showSignupModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowSignupModal(false)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-md rounded-2xl p-8" style={{background: 'rgba(15, 15, 25, 0.95)', border: '1px solid rgba(255,255,255,0.2)'}} onClick={(e) => e.stopPropagation()}>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="w-full max-w-md rounded-2xl p-8 backdrop-blur-xl" style={{background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(148, 163, 184, 0.2)'}} onClick={(e) => e.stopPropagation()}>
               <div className="text-center mb-8">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}}><UserPlus className="w-8 h-8 text-white" /></div>
-                <h2 className="text-2xl font-bold" style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Create Account</h2>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9))'}}><UserPlus className="w-8 h-8 text-white" /></div>
+                <h2 className="text-2xl font-bold" style={{background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Create Account</h2>
                 <p className="text-gray-400 mt-2">Join the future</p>
               </div>
               <form onSubmit={handleSignup} className="space-y-4">
-                <input type="text" value={signupForm.name} onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })} placeholder="Full Name" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} required />
-                <input type="email" value={signupForm.email} onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })} placeholder="Email" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} required />
-                <input type="password" value={signupForm.password} onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })} placeholder="Password (min 6 chars)" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} required />
+                <input type="text" value={signupForm.name} onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })} placeholder="Full Name" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} required />
+                <input type="email" value={signupForm.email} onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })} placeholder="Email" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} required />
+                <input type="password" value={signupForm.password} onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })} placeholder="Password (min 6 chars)" className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 backdrop-blur-xl focus:outline-none" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.2)'}} required />
                 {authError && <p className="text-red-400 text-sm">{authError}</p>}
-                <button type="submit" disabled={authLoading} className="w-full py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2" style={{background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}}>{authLoading ? <Loader2 className="animate-spin" size={20} /> : <UserPlus size={20} />}{authLoading ? 'Creating...' : 'Create Account'}</button>
+                <button type="submit" disabled={authLoading} className="w-full py-3 rounded-xl font-semibold text-white flex items-center justify-center gap-2" style={{background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9))'}}>{authLoading ? <Loader2 className="animate-spin" size={20} /> : <UserPlus size={20} />}{authLoading ? 'Creating...' : 'Create Account'}</button>
               </form>
-              <p className="text-center text-gray-400 text-sm mt-6">Already have account? <button onClick={() => { setShowSignupModal(false); setShowLoginModal(true); }} className="hover:underline" style={{color: '#667eea'}}>Sign in</button></p>
+              <p className="text-center text-gray-400 text-sm mt-6">Already have account? <button onClick={() => { setShowSignupModal(false); setShowLoginModal(true); }} className="hover:underline" style={{color: 'rgba(99, 102, 241, 0.9)'}}>Sign in</button></p>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Dashboard Modals */}
+      <Modal isOpen={!!activeModal} onClose={() => setActiveModal(null)} title={activeModal ? modalTitles[activeModal] : ''}>{renderModalContent()}</Modal>
     </div>
   );
-}
-
-function GraduationCap({ className }: { className?: string }) {
-  return (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z" /><path d="M6 12v5c3 3 9 3 12 0v-5" /></svg>);
 }
