@@ -357,7 +357,7 @@ function QRCodeGenerator() {
   return (
     <div className="space-y-4">
       <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Enter URL or text..." className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 focus:outline-none" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)'}} />
-      <button onClick={() => setGenerated(true)} disabled={!text.trim()} className="w-full py-3 rounded-xl font-semibold text-white" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}} disabled={!text.trim() || !text.trim() ? true : false}><QrCode size={16} className="inline mr-2" /> Generate QR Code</button>
+      <button onClick={() => setGenerated(true)} disabled={!text.trim()} className="w-full py-3 rounded-xl font-semibold text-white" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}}><QrCode size={16} className="inline mr-2" /> Generate QR Code</button>
       {generated && text && (
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
           <div className="w-48 h-48 mx-auto rounded-xl flex items-center justify-center" style={{background: 'white'}}>
