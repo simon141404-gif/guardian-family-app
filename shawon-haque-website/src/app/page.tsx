@@ -371,6 +371,12 @@ export default function Home() {
               ))}
             </div>
 
+            {/* Clock - Right Corner */}
+            <div className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
+              <Clock className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-mono" style={{color: 'rgba(99, 102, 241, 0.9)'}}>{currentTime.toLocaleTimeString()}</span>
+            </div>
+
             <div className="flex items-center space-x-3">
               {isLoggedIn ? (
                 <div className="flex items-center gap-3">
@@ -538,14 +544,6 @@ export default function Home() {
       <section id="contact" className="py-32 px-4">
         <div className="max-w-4xl mx-auto">
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-center mb-8" style={{background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Get In Touch</motion.h2>
-          
-          {/* Clock Above Contact */}
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-4 mb-12">
-            <div className="px-6 py-3 rounded-full backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
-              <span className="text-sm text-gray-400">Current Time: </span>
-              <span className="text-lg font-mono" style={{color: 'rgba(99, 102, 241, 0.9)'}}>{currentTime.toLocaleTimeString()}</span>
-            </div>
-          </motion.div>
           
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} className="rounded-2xl p-8 md:p-12 backdrop-blur-xl" style={{background: 'rgba(30, 41, 59, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)'}}>
             <form className="space-y-6">
